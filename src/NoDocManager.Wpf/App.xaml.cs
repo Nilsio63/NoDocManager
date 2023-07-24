@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NoDocManager.Business.Extensions;
+using NoDocManager.Data.Context;
 using NoDocManager.Data.Extensions;
 using NoDocManager.Wpf.Extensions;
 using NoDocManager.Wpf.Views;
@@ -30,9 +31,18 @@ public partial class App : Application
     {
         await _appHost.StartAsync();
 
+        CreateDatabase();
+
         _appHost.Services.GetRequiredService<MainWindow>().Show();
 
         base.OnStartup(e);
+    }
+
+    private void CreateDatabase()
+    {
+        using IServiceScope scope = _appHost.Services.CreateScope();
+
+        scope.ServiceProvider.GetRequiredService<NoDocManagerContext>().Database.EnsureCreated();
     }
 
     protected override async void OnExit(ExitEventArgs e)
